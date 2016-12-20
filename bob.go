@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"fmt"
 	"os"
 
 	"github.com/ivanfoo/bob/cmd"
@@ -26,12 +25,13 @@ func main() {
 		},
 		{
 			Name:   "init",
-			Usage:  "set up remotes",
+			Usage:  "set up bob remote",
 			Action: cmd.Init,
 			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "t, type",
-					Usage: "kind of tech",
+				cli.StringFlag{
+					Name:  "remote",
+					Usage: "remote name",
+					Value: "forge",
 				},
 			},
 		},
@@ -39,6 +39,20 @@ func main() {
 			Name:   "publish",
 			Usage:  "publish changes to forge",
 			Action: cmd.Publish,
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "name",
+					Usage: "project name",
+				},
+				cli.StringFlag{
+					Name:  "description",
+					Usage: "project description",
+				},
+				cli.StringFlag{
+					Name:  "token",
+					Usage: "gitlab api token",
+				},
+			},
 		},
 		{
 			Name:   "sync",

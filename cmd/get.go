@@ -2,54 +2,79 @@ package cmd
 
 import (
 	"fmt"
-	//"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 
 	"gopkg.in/urfave/cli.v1"
 )
 
 var (
-	bobLibrary = os.Getenv("BOB_LIBRARY")
-	bobSrc     = os.Getenv("BOB_SRC")
+	bobSrc = os.Getenv("BOB_SRC")
 )
 
 func Get(c *cli.Context) error {
-	repo := fmt.Sprintf("%s/%s", bobSrc, c.Args().First())
-	repoDir := fmt.Sprintf("%s/%s", bobLibrary, c.Args().First())
+	remote := fmt.Sprintf("%s:%s", bobSrc, c.Args().First())
+	pwd, _ := os.Getwd()
+	path := filepath.Join(pwd, c.Args().First())
 
-	if dirExists(repoDir) {
-		fmt.Println("already cloned")
+	if dirExists(path) {
+		if c.Bool("update") {
+			updateLocalRepo("forge", "master", path)
+			return nil
+		}
+
+		fmt.Println("Repo already exists locally. To update it, run bob get -u " + c.Args().First())
 		return nil
 	}
 
-	err := cloneRepo(repo, repoDir)
-
-	if err != nil {
-		fmt.Println("error cloning repo")
-	}
+	err := cloneRepo(remote, "forge", path)
 
 	return err
 }
 
 func dirExists(path string) bool {
 	_, err := os.Stat(path)
-	fmt.Println(path)
 	if err == nil {
-		fmt.Println("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-		if os.IsExist(err) {
-			fmt.Println("bbbbbb")
-			return true
-		}
+		return true
 	}
 
 	return false
 }
 
-func cloneRepo(remote, path string) error {
-	fmt.Println("cloning repository...")
-	cmd := exec.Command("git", "clone", remote, path)
+func cloneRepo(remote, remoteName, path string) error {
+	fmt.Print("Cloning repository...")
+
+	cmd := exec.Command("git", "clone", "-o", remoteName, remote, path)
 	err := cmd.Run()
 
-	return err
+	if err != nil {
+		fmt.Println("error!")
+		return err
+	}
+
+	fmt.Println("done")
+
+	return nil
+}
+
+func updateLocalRepo(remote, branch, path string) error {
+	fmt.Print("Updating repository...")
+
+	err := os.Chdir(path)
+	if err != nil {
+		return err
+	}
+
+	cmd := exec.Command("git", "pull", remote, branch)
+	err = cmd.Run()
+
+	if err != nil {
+		fmt.Println("error!")
+		return err
+	}
+
+	fmt.Println("done")
+
+	return nil
 }
