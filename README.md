@@ -10,5 +10,3 @@
 
 It requires having git installed
 
-## TODO
-DOCS!
