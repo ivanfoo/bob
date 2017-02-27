@@ -10,4 +10,3 @@
 
 It requires having git installed
 
-"aaa"
