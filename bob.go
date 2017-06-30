@@ -10,6 +10,8 @@ import (
 
 func main() {
 	app := cli.NewApp()
+	app.Name = "bob"
+	app.Usage = "easy git remotes syncing"
 
 	app.Commands = []cli.Command{
 		{
